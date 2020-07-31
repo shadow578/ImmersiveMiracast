@@ -25,7 +25,7 @@ namespace ImmersiveMiracast.UI
         }
 
         /// <summary>
-        /// initialize the cast ui
+        /// initialize the cast ui on the primary screen
         /// </summary>
         /// <param name="title">the title for the window</param>
         /// <param name="player">player to render to the window</param>
@@ -36,6 +36,39 @@ namespace ImmersiveMiracast.UI
 
             //set player to render to media element
             mediaPlayerElement.SetMediaPlayer(player);
+
+            //move window to primary scrren
+            Location = Screen.PrimaryScreen.Bounds.Location;
+
+            //be immersive
+            GoImmersive();
+        }
+
+        /// <summary>
+        /// initialize the cast ui on the given screen
+        /// </summary>
+        /// <param name="title">the title for the window</param>
+        /// <param name="player">player to render to the window</param>
+        /// <param name="screen">screen to display the ui on. this is a index to Screen.AllScreens</param>
+        public ImmersiveCastUI(string title, UWPMediaPlayer player, int screen)
+        {
+            //set title
+            Text = title;
+
+            //set player to render to media element
+            mediaPlayerElement.SetMediaPlayer(player);
+
+            //move window to desired screen, check bounds first
+            if (screen < 0 || screen >= Screen.AllScreens.Length)
+            {
+                //default to primary screen
+                Location = Screen.PrimaryScreen.Bounds.Location;
+            }
+            else
+            {
+                //move to desired screen
+                Location = Screen.AllScreens[screen].Bounds.Location;
+            }
 
             //be immersive
             GoImmersive();

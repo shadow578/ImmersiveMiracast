@@ -166,7 +166,12 @@ namespace ImmersiveMiracast.Core
             ShowToast(S.AppName, S.CastWelcome.Format(transmitterName));
 
             //init and show cast ui
-            castUI = new ImmersiveCastUI(S.AppName, castPlayer);
+            if (App.Config.CastDisplayId < 0)
+                //primary screen
+                castUI = new ImmersiveCastUI(S.AppName, castPlayer);
+            else
+                //selected screen
+                castUI = new ImmersiveCastUI(S.AppName, castPlayer, App.Config.CastDisplayId);
             castUI.KeyPreview = true;
             castUI.PreviewKeyDown += (s, e) =>
             {

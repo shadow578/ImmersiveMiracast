@@ -28,11 +28,18 @@ namespace ImmersiveMiracast
         public static CastApp AppInstance { get; private set; }
 
         [STAThread]
-        public static void Main()
+        public static void Main(string[] args)
         {
             //forms stuff
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(true);
+
+            //reset config on launch with -resetConfig flag
+            foreach (string arg in args)
+            {
+                if (arg.Equals("-resetConfig", StringComparison.OrdinalIgnoreCase))
+                    new AppConfig().ToFile(GetConfigFile());
+            }
 
             do
             {
@@ -40,7 +47,7 @@ namespace ImmersiveMiracast
                 shouldRestartApp = false;
 
                 //(re)load config
-                Config = AppConfig.FromFile(GetConfigFile());
+                LoadConfig();
 
                 //enable / disable autostart
                 Win32Util.RegisterAutostart(Config.Strings.AppName, GetLaunchCommand(), Config.ShouldAppAutostart);
@@ -49,6 +56,18 @@ namespace ImmersiveMiracast
                 AppInstance = new CastApp();
                 Application.Run(AppInstance);
             } while (shouldRestartApp);
+        }
+
+        /// <summary>
+        /// load the config into App.Config
+        /// </summary>
+        static void LoadConfig()
+        {
+            //load from file
+            Config = AppConfig.FromFile(GetConfigFile());
+
+            //rewrite config file (in case config layout changed, to add the missing keys)
+            Config.ToFile(GetConfigFile());
         }
 
         /// <summary>

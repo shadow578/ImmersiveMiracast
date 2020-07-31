@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Xml.Serialization;
 
-namespace ImmersiveMiracast.Util
+namespace ImmersiveMiracast.Core
 {
     /// <summary>
     /// contains the application configuration
@@ -14,6 +14,12 @@ namespace ImmersiveMiracast.Util
         /// {MACHINE_NAME} will be replaced with actual name of the machine
         /// </summary>
         public string CastDisplayName { get; set; } = "ImmersiveCast on {MACHINE_NAME}";
+
+        /// <summary>
+        /// display to show the cast ui on. 
+        /// use -1 to use the primary screen
+        /// </summary>
+        public int CastDisplayId { get; set; } = -1;
 
         /// <summary>
         /// command to use when using "configure" option
