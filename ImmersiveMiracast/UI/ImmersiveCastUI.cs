@@ -50,7 +50,7 @@ namespace ImmersiveMiracast.UI
         /// <param name="title">the title for the window</param>
         /// <param name="player">player to render to the window</param>
         /// <param name="screen">screen to display the ui on. this is a index to Screen.AllScreens</param>
-        public ImmersiveCastUI(string title, UWPMediaPlayer player, int screen)
+        public ImmersiveCastUI(string title, UWPMediaPlayer player, int screen) : this()
         {
             //set title
             Text = title;

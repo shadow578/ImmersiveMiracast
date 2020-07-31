@@ -4,6 +4,7 @@ using ImmersiveMiracast.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using UWPMediaPlayer = Windows.Media.Playback.MediaPlayer;
@@ -42,6 +43,11 @@ namespace ImmersiveMiracast.Core
         ImmersiveCastUI castUI;
 
         /// <summary>
+        /// currently active pin ui
+        /// </summary>
+        PinUI pinUI;
+
+        /// <summary>
         /// current instance of the config ui
         /// </summary>
         ConfigurationUI configUI;
@@ -69,10 +75,12 @@ namespace ImmersiveMiracast.Core
             miracastReceiver = new MiracastReceiverWrapper()
             {
                 DisplayName = name,
-                AutoStartNewSession = true
+                AutoStartNewSession = true,
+                RequirePinAuth = App.Config.CastRequirePin
             };
 
             //register events
+            miracastReceiver.PinAvailable += OnPinAvailable;
             miracastReceiver.CastStart += OnCastStart;
             miracastReceiver.CastEnd += OnCastEnd;
             miracastReceiver.WriteLog += Log;
@@ -160,6 +168,38 @@ namespace ImmersiveMiracast.Core
         }
 
         /// <summary>
+        /// called when a new pin is available. Show this pin somewhere in your ui, and only hide it when either CastStart or CastEnd have been called.
+        /// only called when RequirePinAuth is set to true.
+        /// </summary>
+        /// <param name="pin">the pin that is available</param>
+        void OnPinAvailable(string pin)
+        {
+            //init and show pin ui
+            Log($"new pin available: {pin}");
+            if (App.Config.CastDisplayId < 0)
+                //primary screen
+                pinUI = new PinUI(pin);
+            else
+                //selected screen
+                pinUI = new PinUI(pin, App.Config.CastDisplayId);
+
+            pinUI.Show();
+
+            //hide pin after 30 seconds
+            //im not sure if this is really needed, as a transmitter should ALWAYS disconnect the session when declining the pin.
+            //this is more of a fallback, as some devices i tested with did just keep the connection alive
+            Task.Run(async () =>
+            {
+                await Task.Delay(App.Config.PinUiTimeout);
+                pinUI?.Invoke(new MethodInvoker(() =>
+                {
+                    pinUI?.Close();
+                    pinUI = null;
+                }));
+            });
+        }
+
+        /// <summary>
         /// called when a new cast session starts, and the media source was created and is ready. 
         /// note that this is called before playback is started.
         /// </summary>
@@ -167,6 +207,10 @@ namespace ImmersiveMiracast.Core
         /// <param name="castPlayer">player that plays the cast stream</param>
         void OnCastStart(string transmitterName, UWPMediaPlayer castPlayer)
         {
+            //hide pin ui
+            pinUI?.Close();
+            pinUI = null;
+
             //show info
             Log("cast playback started");
             ShowToast(S.AppName, S.CastWelcome.ReplaceMap(new Dictionary<string, string>
@@ -199,6 +243,10 @@ namespace ImmersiveMiracast.Core
         /// </summary>
         void OnCastEnd()
         {
+            //hide pin ui
+            pinUI?.Close();
+            pinUI = null;
+
             //show info
             Log("cast playback ended");
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -21,6 +20,16 @@ namespace ImmersiveMiracast.Core
         /// use -1 to use the primary screen
         /// </summary>
         public int CastDisplayId { get; set; } = -1;
+
+        /// <summary>
+        /// is entering of a pin required to connect to the receiver?
+        /// </summary>
+        public bool CastRequirePin { get; set; } = false;
+
+        /// <summary>
+        /// timeout until the pin ui is closed
+        /// </summary>
+        public int PinUiTimeout { get; set; } = 30000;
 
         /// <summary>
         /// command to use when using "configure" option

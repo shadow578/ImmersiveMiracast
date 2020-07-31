@@ -52,6 +52,12 @@ namespace ImmersiveMiracast.Core
 
         #region Events
         /// <summary>
+        /// called when a new pin is available. Show this pin somewhere in your ui, and only hide it when either CastStart or CastEnd have been called.
+        /// only called when RequirePinAuth is set to true.
+        /// </summary>
+        public event Action<string /*pin*/> PinAvailable;
+
+        /// <summary>
         /// called when a new cast session starts, and the media source was created and is ready. 
         /// note that this is called before playback is started.
         /// </summary>
@@ -96,6 +102,12 @@ namespace ImmersiveMiracast.Core
         public bool AutoStartNewSession { get; set; } = true;
 
         /// <summary>
+        /// is entering a pin required to connect?
+        /// make sure you handle PinAvailable event if you enable this!
+        /// </summary>
+        public bool RequirePinAuth { get; set; } = false;
+
+        /// <summary>
         /// get the currently active cast connection. If no connection is active, null is returned.
         /// </summary>
         public MiracastReceiverConnection CurrentConnection { get; private set; }
@@ -114,7 +126,7 @@ namespace ImmersiveMiracast.Core
             castReceiver.StatusChanged += OnReceiverStatusChanged;
 
             //apply settings
-            castReceiver.DisconnectAllAndApplySettings(GetReceiverSettings(castReceiver, DisplayName));
+            castReceiver.DisconnectAllAndApplySettings(GetReceiverSettings(castReceiver));
         }
 
         /// <summary>
@@ -210,7 +222,12 @@ namespace ImmersiveMiracast.Core
             CurrentConnection = args.Connection;
             CurrentConnection.InputDevices.Keyboard.TransmitInput = false;
 
-            Log($"new connection created with {CurrentConnection.Transmitter.Name} ({CurrentConnection.Transmitter.MacAddress})");
+            //send pin event
+            if (!string.IsNullOrWhiteSpace(args.Pin))
+                PinAvailable?.Invoke(args.Pin);
+
+            //log details
+            Log($"new connection created with {CurrentConnection.Transmitter.Name} ({CurrentConnection.Transmitter.MacAddress}). Auth pin is {(string.IsNullOrWhiteSpace(args.Pin) ? "No Pin" : args.Pin)}");
         }
 
         /// <summary>
@@ -240,13 +257,12 @@ namespace ImmersiveMiracast.Core
         /// initialize settings for the miracast receiver
         /// </summary>
         /// <param name="receiver">the receiver to get settings for</param>
-        /// <param name="displayName">displayname to use for the receiver</param>
         /// <returns>initialized settings</returns>
-        MiracastReceiverSettings GetReceiverSettings(MiracastReceiver receiver, string displayName)
+        MiracastReceiverSettings GetReceiverSettings(MiracastReceiver receiver)
         {
             MiracastReceiverSettings s = receiver.GetDefaultSettings();
-            s.AuthorizationMethod = MiracastReceiverAuthorizationMethod.None;
-            s.FriendlyName = displayName;
+            s.AuthorizationMethod = RequirePinAuth ? MiracastReceiverAuthorizationMethod.PinDisplayRequired : MiracastReceiverAuthorizationMethod.None;
+            s.FriendlyName = DisplayName;
             return s;
         }
 

@@ -58,6 +58,7 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.sharedTooltip = new System.Windows.Forms.ToolTip(this.components);
             this.groupAdvanced = new System.Windows.Forms.GroupBox();
+            this.cCastRequirePin = new System.Windows.Forms.CheckBox();
             groupStrings = new System.Windows.Forms.GroupBox();
             label7 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
@@ -228,6 +229,7 @@
             // 
             // groupApp
             // 
+            groupApp.Controls.Add(this.cCastRequirePin);
             groupApp.Controls.Add(this.btnIdentifyScreenIds);
             groupApp.Controls.Add(label9);
             groupApp.Controls.Add(this.cbCastScreenId);
@@ -369,6 +371,17 @@
             this.groupAdvanced.TabStop = false;
             this.groupAdvanced.Text = "Advanced";
             // 
+            // cCastRequirePin
+            // 
+            this.cCastRequirePin.AutoSize = true;
+            this.cCastRequirePin.Location = new System.Drawing.Point(6, 140);
+            this.cCastRequirePin.Name = "cCastRequirePin";
+            this.cCastRequirePin.Size = new System.Drawing.Size(148, 19);
+            this.cCastRequirePin.TabIndex = 30;
+            this.cCastRequirePin.Text = "Require Pin to Connect";
+            this.cCastRequirePin.UseVisualStyleBackColor = true;
+            this.cCastRequirePin.CheckedChanged += new System.EventHandler(this.OnCastToPrimaryScreenChange);
+            // 
             // ConfigurationUI
             // 
             this.AcceptButton = this.btnApply;
@@ -412,5 +425,6 @@
         private System.Windows.Forms.CheckBox cCastPrimaryScreen;
         private System.Windows.Forms.GroupBox groupAdvanced;
         private System.Windows.Forms.Button btnIdentifyScreenIds;
+        private System.Windows.Forms.CheckBox cCastRequirePin;
     }
 }

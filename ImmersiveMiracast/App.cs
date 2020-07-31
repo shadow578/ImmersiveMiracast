@@ -1,4 +1,5 @@
 ﻿using ImmersiveMiracast.Core;
+using ImmersiveMiracast.UI;
 using ImmersiveMiracast.UI.Config;
 using ImmersiveMiracast.Util;
 using System;

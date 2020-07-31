@@ -70,6 +70,7 @@ namespace ImmersiveMiracast.UI.Config
                 cbCastScreenId.SelectedIndex = cfg.CastDisplayId;
                 cCastPrimaryScreen.Checked = false;
             }
+            cCastRequirePin.Checked = cfg.CastRequirePin;
 
             //strings
             tAppName.Text = cfg.Strings.AppName;
@@ -110,6 +111,7 @@ namespace ImmersiveMiracast.UI.Config
             {
                 cfg.CastDisplayId = cbCastScreenId.SelectedIndex;
             }
+            cfg.CastRequirePin = cCastRequirePin.Checked;
 
             //strings
             cfg.Strings.AppName = tAppName.Text;

@@ -29,7 +29,7 @@ namespace ImmersiveMiracast.Util
         public static string ReplaceMap(this string s, Dictionary<string, string> map, bool ignoreCase = false)
         {
             foreach (string key in map.Keys)
-                s.Replace(key, map[key], ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
+                s = s.Replace(key, map[key], ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal);
 
             return s;
         }
