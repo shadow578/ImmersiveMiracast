@@ -68,6 +68,7 @@ namespace ImmersiveMiracast.UI
             Task.Run(async () =>
             {
                 await Task.Delay(timeout);
+                if (trayIcon == null) return;
                 trayIcon.Visible = false;
                 trayIcon.Visible = true;
             });
