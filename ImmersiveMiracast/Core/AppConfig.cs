@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -55,8 +56,7 @@ namespace ImmersiveMiracast.Core
             XmlSerializer serializer = new XmlSerializer(typeof(AppConfig));
             using (XmlReader reader = XmlReader.Create(path))
             {
-                AppConfig cfg = serializer.Deserialize(reader) as AppConfig;
-                if (cfg == null)
+                if (!(serializer.Deserialize(reader) is AppConfig cfg))
                     cfg = new AppConfig();
                 return cfg;
             }
@@ -96,9 +96,9 @@ namespace ImmersiveMiracast.Core
 
         /// <summary>
         /// Application is ready to receive
-        /// 0 = castReceiver.GetCurrentSettings().FriendlyName; = display name of the receiver
+        /// {DisplayName}: display name of the receiver
         /// </summary>
-        public string CastReady { get; set; } = "All set!\nConnect to \"{0}\" to begin casting.";
+        public string CastReady { get; set; } = "All set!\nConnect to \"{DisplayName}\" to begin casting.";
 
         /// <summary>
         /// miracast is not supported on the device
@@ -112,9 +112,10 @@ namespace ImmersiveMiracast.Core
 
         /// <summary>
         /// a new connection was made with the receiver
-        /// 0 = currentConnection.Transmitter.Name; = Display name of the transmitter
+        /// {DisplayName}: display name of the receiver
+        /// {Transmitter}: display name of the transmitter currently casting
         /// </summary>
-        public string CastWelcome { get; set; } = "{0} now shares their screen.";
+        public string CastWelcome { get; set; } = "{Transmitter} now shares their screen.";
 
         /// <summary>
         /// text body for configuration reset confirmation dialog

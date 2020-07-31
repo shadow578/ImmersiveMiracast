@@ -1,4 +1,5 @@
 ﻿using ImmersiveMiracast.Core;
+using ImmersiveMiracast.UI.Config;
 using ImmersiveMiracast.Util;
 using System;
 using System.IO;
@@ -13,9 +14,9 @@ namespace ImmersiveMiracast
     public static class App
     {
         /// <summary>
-        /// app should not close, but instead restart itself
+        /// main app instance
         /// </summary>
-        public static bool shouldRestartApp;
+        public static CastApp AppInstance { get; private set; }
 
         /// <summary>
         /// Application config
@@ -23,9 +24,44 @@ namespace ImmersiveMiracast
         public static AppConfig Config { get; private set; }
 
         /// <summary>
-        /// main app instance
+        /// path to the config file for the current user
         /// </summary>
-        public static CastApp AppInstance { get; private set; }
+        public static string ConfigFile
+        {
+            get
+            {
+                //return Path.Combine(Application.LocalUserAppDataPath, "config.xml");
+                string cfgDir = Path.Combine(Directory.GetParent(Application.LocalUserAppDataPath).FullName, "config.xml");
+                Directory.CreateDirectory(Path.GetDirectoryName(cfgDir));
+                return cfgDir;
+            }
+        }
+
+        /// <summary>
+        /// Get the launch command for the app
+        /// </summary>
+        public static string LaunchCommand
+        {
+            get
+            {
+                //get path for current assembly
+                string cmdLine = Assembly.GetExecutingAssembly().Location;
+
+                //fix for dotnet running in .dll files
+                if (Path.GetExtension(cmdLine).Equals(".dll", StringComparison.OrdinalIgnoreCase))
+                {
+                    //get exe instead of dll
+                    cmdLine = Path.Combine(Path.GetDirectoryName(cmdLine), Path.GetFileNameWithoutExtension(cmdLine) + ".exe");
+                }
+
+                return cmdLine;
+            }
+        }
+
+        /// <summary>
+        /// app should not close, but instead restart itself
+        /// </summary>
+        public static bool ShouldRestartApp { get; set; }
 
         [STAThread]
         public static void Main(string[] args)
@@ -38,24 +74,24 @@ namespace ImmersiveMiracast
             foreach (string arg in args)
             {
                 if (arg.Equals("-resetConfig", StringComparison.OrdinalIgnoreCase))
-                    new AppConfig().ToFile(GetConfigFile());
+                    new AppConfig().ToFile(ConfigFile);
             }
 
             do
             {
                 //reset restart flag
-                shouldRestartApp = false;
+                ShouldRestartApp = false;
 
                 //(re)load config
                 LoadConfig();
 
                 //enable / disable autostart
-                Win32Util.RegisterAutostart(Config.Strings.AppName, GetLaunchCommand(), Config.ShouldAppAutostart);
+                Win32Util.RegisterAutostart(Config.Strings.AppName, LaunchCommand, Config.ShouldAppAutostart);
 
                 //start app
                 AppInstance = new CastApp();
                 Application.Run(AppInstance);
-            } while (shouldRestartApp);
+            } while (ShouldRestartApp);
         }
 
         /// <summary>
@@ -64,41 +100,10 @@ namespace ImmersiveMiracast
         static void LoadConfig()
         {
             //load from file
-            Config = AppConfig.FromFile(GetConfigFile());
+            Config = AppConfig.FromFile(ConfigFile);
 
             //rewrite config file (in case config layout changed, to add the missing keys)
-            Config.ToFile(GetConfigFile());
-        }
-
-        /// <summary>
-        /// get the config path for the current user
-        /// </summary>
-        /// <returns>path to config file</returns>
-        public static string GetConfigFile()
-        {
-            //return Path.Combine(Application.LocalUserAppDataPath, "config.xml");
-            string cfgDir = Path.Combine(Directory.GetParent(Application.LocalUserAppDataPath).FullName, "config.xml");
-            Directory.CreateDirectory(Path.GetDirectoryName(cfgDir));
-            return cfgDir;
-        }
-
-        /// <summary>
-        /// Get the launch command for the app
-        /// </summary>
-        /// <returns>the launch command</returns>
-        public static string GetLaunchCommand()
-        {
-            //get path for current assembly
-            string cmdLine = Assembly.GetExecutingAssembly().Location;
-
-            //fix for dotnet running in .dll files
-            if (Path.GetExtension(cmdLine).Equals(".dll", StringComparison.OrdinalIgnoreCase))
-            {
-                //get exe instead of dll
-                cmdLine = Path.Combine(Path.GetDirectoryName(cmdLine), Path.GetFileNameWithoutExtension(cmdLine) + ".exe");
-            }
-
-            return cmdLine;
+            Config.ToFile(ConfigFile);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using ImmersiveMiracast.UI;
+using ImmersiveMiracast.UI.Config;
 using ImmersiveMiracast.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -39,6 +41,11 @@ namespace ImmersiveMiracast.Core
         /// </summary>
         ImmersiveCastUI castUI;
 
+        /// <summary>
+        /// current instance of the config ui
+        /// </summary>
+        ConfigurationUI configUI;
+
         public CastApp()
         {
             //register application exit
@@ -76,7 +83,10 @@ namespace ImmersiveMiracast.Core
             {
                 case MiracastReceiverWrapper.SessionStartResult.Success:
                     Log("miracast init finished without error");
-                    ShowToast(S.AppName, S.CastReady.Format(miracastReceiver.DisplayName));
+                    ShowToast(S.AppName, S.CastReady.ReplaceMap(new Dictionary<string, string>
+                    {
+                        {"{displayname}", miracastReceiver.DisplayName }
+                    }, true));
                     break;
 
                 case MiracastReceiverWrapper.SessionStartResult.MiracastNotSupported:
@@ -105,20 +115,16 @@ namespace ImmersiveMiracast.Core
             trayUI.Init(S.AppName, SharedResources.app_icon);
 
             //add menu options
-            trayUI.AddMenuItem(S.TrayResetConfig, (s, e) =>
-            {
-                Log("USER: reset config");
-                if (MessageBox.Show(S.AppName, S.ResetConfigConfirmation, MessageBoxButtons.YesNo) != DialogResult.Yes) return;
-
-                //user is ok with config reset, do it
-                new AppConfig().ToFile(App.GetConfigFile());
-                App.shouldRestartApp = true;
-                Application.Exit();
-            });
             trayUI.AddMenuItem(S.TrayConfigure, (s, e) =>
             {
                 Log("USER: open config");
-                Process.Start(App.Config.ConfigureCommand, App.GetConfigFile());
+
+                //only allow one config ui
+                configUI?.Close();
+
+                //open new ui
+                configUI = new ConfigurationUI(App.ConfigFile);
+                configUI.Show();
             });
             trayUI.AddMenuItem(S.TrayRestartSession, (s, e) =>
             {
@@ -128,13 +134,13 @@ namespace ImmersiveMiracast.Core
             trayUI.AddMenuItem(S.TrayRestartApp, (s, e) =>
             {
                 Log("USER: restart application");
-                App.shouldRestartApp = true;
+                App.ShouldRestartApp = true;
                 Application.Exit();
             });
             trayUI.AddMenuItem(S.TrayExitApp, (s, e) =>
             {
                 Log("USER: exit application");
-                App.shouldRestartApp = false;
+                App.ShouldRestartApp = false;
                 Application.Exit();
             });
         }
@@ -163,7 +169,11 @@ namespace ImmersiveMiracast.Core
         {
             //show info
             Log("cast playback started");
-            ShowToast(S.AppName, S.CastWelcome.Format(transmitterName));
+            ShowToast(S.AppName, S.CastWelcome.ReplaceMap(new Dictionary<string, string>
+            {
+                {"{displayname}", miracastReceiver.DisplayName },
+                {"{transmitter}", transmitterName }
+            }, true));
 
             //init and show cast ui
             if (App.Config.CastDisplayId < 0)
