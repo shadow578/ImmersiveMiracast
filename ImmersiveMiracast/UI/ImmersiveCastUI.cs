@@ -6,7 +6,7 @@ using UWPMediaPlayer = Windows.Media.Playback.MediaPlayer;
 namespace ImmersiveMiracast.UI
 {
     /// <summary>
-    /// fullscreen cast display ui
+    /// fullscreen cast and pin display ui
     /// </summary>
     public partial class ImmersiveCastUI : Form
     {
@@ -114,11 +114,29 @@ namespace ImmersiveMiracast.UI
         }
 
         /// <summary>
+        /// dispose xaml controls and hide the ui.
+        /// This allows reuse of the control
+        /// </summary>
+        public new void Hide()
+        {
+            //dispose xaml components
+            if (mediaPlayerElement != null)
+            {
+                Controls.Remove(mediaPlayerElement);
+                mediaPlayerElement.Dispose();
+                mediaPlayerElement = null;
+            }
+
+            //hide ui
+            base.Hide();
+        }
+
+        /// <summary>
         /// enter fullscreen to finish immersive mode
         /// </summary>
         void GoImmersive()
         {
-            //window go -brr- fullscreen
+            //window go brr
             FormBorderStyle = FormBorderStyle.None;
             WindowState = FormWindowState.Maximized;
 
@@ -130,15 +148,6 @@ namespace ImmersiveMiracast.UI
             {
                 Cursor.Show();
             };
-        }
-
-        /// <summary>
-        /// internal Dispose(bool) function
-        /// </summary>
-        void DisposeInt()
-        {
-            mediaPlayerElement?.Dispose();
-            mediaPlayerElement = null;
         }
     }
 }

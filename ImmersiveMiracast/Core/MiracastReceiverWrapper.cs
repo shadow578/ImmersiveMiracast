@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
 using Windows.Media.Miracast;
 using UWPMediaPlayer = Windows.Media.Playback.MediaPlayer;
 
@@ -46,9 +49,24 @@ namespace ImmersiveMiracast.Core
         UWPMediaPlayer currentPlayer;
 
         /// <summary>
+        /// task that automatically times out the current conection if no media source is created
+        /// </summary>
+        Task currentConnectionTimeoutTask;
+
+        /// <summary>
+        /// token to cancel the current connection's timeout
+        /// </summary>
+        CancellationTokenSource currentConnectionTimeoutCancellation;
+
+        /// <summary>
         /// internal version of DisplayName propertie, shortened to 50 characters
         /// </summary>
         string displayNameInt = "MiracastReceiver";
+
+        /// <summary>
+        /// dispatcher to run stuff on the main thread
+        /// </summary>
+        Dispatcher mainThreadDispatcher;
 
         #region Events
         /// <summary>
@@ -108,6 +126,12 @@ namespace ImmersiveMiracast.Core
         public bool RequirePinAuth { get; set; } = false;
 
         /// <summary>
+        /// timeout until a connection that did not yield a media source automatically shut down.
+        /// Set to 0 or below to disable timeouts
+        /// </summary>
+        public int DeadConnectionTimeout { get; set; } = 30000;
+
+        /// <summary>
         /// get the currently active cast connection. If no connection is active, null is returned.
         /// </summary>
         public MiracastReceiverConnection CurrentConnection { get; private set; }
@@ -120,6 +144,9 @@ namespace ImmersiveMiracast.Core
         /// </summary>
         public void InitReceiver()
         {
+            //create dispatcher
+            mainThreadDispatcher = Dispatcher.FromThread(Thread.CurrentThread);
+
             //init receiver
             Log("start initializing receiver");
             castReceiver = new MiracastReceiver();
@@ -226,6 +253,40 @@ namespace ImmersiveMiracast.Core
             if (!string.IsNullOrWhiteSpace(args.Pin))
                 PinAvailable?.Invoke(CurrentConnection.Transmitter.Name, args.Pin);
 
+            //start timeout task
+            currentConnectionTimeoutCancellation = new CancellationTokenSource();
+            if (DeadConnectionTimeout > 0)
+            {
+                currentConnectionTimeoutTask = Task.Run(async () =>
+                {
+                    try
+                    {
+                        //wait until timeout
+                        await Task.Delay(DeadConnectionTimeout, currentConnectionTimeoutCancellation.Token);
+
+                        //check if a media player was created
+                        if (currentPlayer == null)
+                        {
+                            //no media source was created, kill connection
+                            Log($"no media player was created, killing connection to {CurrentConnection?.Transmitter?.MacAddress}");
+                            Invoke(() =>
+                            {
+                                StartNewSession();
+                            });
+                            return;
+                        }
+
+                        //connection looks fine to me 
+                        Log("connection looks healthy, timeout task will now shut down.");
+                    }
+                    catch (TaskCanceledException _)
+                    {
+                        //timeout was cancelled
+                        Log("connection timeout was cancelled");
+                    }
+                });
+            }
+
             //log details
             Log($"new connection created with {CurrentConnection.Transmitter.Name} ({CurrentConnection.Transmitter.MacAddress}). Auth pin is {(string.IsNullOrWhiteSpace(args.Pin) ? "No Pin" : args.Pin)}");
         }
@@ -235,6 +296,9 @@ namespace ImmersiveMiracast.Core
         /// </summary>
         void OnSessionMediaSourceCreated(MiracastReceiverSession sender, MiracastReceiverMediaSourceCreatedEventArgs args)
         {
+            //set flag
+            currentConnectionTimeoutCancellation?.Cancel();
+
             //init mediaplayer
             currentPlayer = new UWPMediaPlayer()
             {
@@ -272,14 +336,15 @@ namespace ImmersiveMiracast.Core
         /// <param name="sendEvent">should CastEnd be called?</param>
         void EndCurrentSession(bool sendEvent)
         {
+            currentPlayer?.Pause();
+            currentPlayer?.Dispose();
+            currentPlayer = null;
+
             CurrentConnection?.Disconnect(MiracastReceiverDisconnectReason.Finished);
             CurrentConnection = null;
 
             currentSession?.Dispose();
             currentSession = null;
-
-            currentPlayer?.Dispose();
-            currentPlayer = null;
 
             if (sendEvent)
                 CastEnd?.Invoke();
@@ -292,6 +357,15 @@ namespace ImmersiveMiracast.Core
         void Log(string s)
         {
             WriteLog?.Invoke(s);
+        }
+
+        /// <summary>
+        /// invoke a action on the apps main thread
+        /// </summary>
+        /// <param name="a">the action to run</param>
+        void Invoke(Action a)
+        {
+            mainThreadDispatcher?.Invoke(a);
         }
     }
 }

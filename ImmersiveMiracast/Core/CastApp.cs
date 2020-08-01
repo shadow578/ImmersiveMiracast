@@ -4,7 +4,6 @@ using ImmersiveMiracast.Util;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using UWPMediaPlayer = Windows.Media.Playback.MediaPlayer;
@@ -189,25 +188,6 @@ namespace ImmersiveMiracast.Core
                 {"{Pin}", pin }
             }));
             castUI.Show();
-
-            //hide pin after 30 seconds
-            //im not sure if this is really needed, as a transmitter should ALWAYS disconnect the session when declining the pin.
-            //this is more of a fallback, as some devices i tested with did just keep the connection alive
-            Task.Run(async () =>
-            {
-                await Task.Delay(App.Config.PinUiTimeout);
-                castUI?.Invoke(new MethodInvoker(() =>
-                {
-                    //close ui if no playback started
-                    if (castPlaybackStarted) return;
-
-                    Log("timeout reached, closing cast ui");
-                    castUI?.Close();
-                    castUI = null;
-
-                    miracastReceiver.StartNewSession();
-                }));
-            });
         }
 
         /// <summary>
@@ -251,9 +231,9 @@ namespace ImmersiveMiracast.Core
             Log("cast playback ended");
             castPlaybackStarted = false;
 
-            //close cast ui
-            castUI?.Close();
-            castUI = null;
+            //recycle cast ui
+            //have to recycle the ui as the xaml host (and thus the media player element) locks up otherwise 
+            castUI?.Hide();
         }
         #endregion
 
