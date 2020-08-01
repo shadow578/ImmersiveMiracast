@@ -120,12 +120,15 @@ namespace ImmersiveMiracast
                 foreach (Process p in Process.GetProcesses())
                 {
                     if (p.ProcessName.Equals("CastSrv", StringComparison.OrdinalIgnoreCase))
+                    {
+                        Debug.WriteLine($"Killing CastSrv with PID {p.Id}");
                         p.Kill(true);
+                    }
                 }
             }
             catch (Exception e)
             {
-                Debug.WriteLine($"TryKillCastServer(): {e.ToString()}");
+                Debug.WriteLine($"TryKillCastServer(): {e}");
             }
         }
     }
