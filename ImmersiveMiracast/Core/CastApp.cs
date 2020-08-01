@@ -43,14 +43,14 @@ namespace ImmersiveMiracast.Core
         ImmersiveCastUI castUI;
 
         /// <summary>
-        /// currently active pin ui
-        /// </summary>
-        PinUI pinUI;
-
-        /// <summary>
         /// current instance of the config ui
         /// </summary>
         ConfigurationUI configUI;
+
+        /// <summary>
+        /// did playback of the cast stream start?
+        /// </summary>
+        bool castPlaybackStarted = false;
 
         public CastApp()
         {
@@ -174,23 +174,21 @@ namespace ImmersiveMiracast.Core
         /// called when a new pin is available. Show this pin somewhere in your ui, and only hide it when either CastStart or CastEnd have been called.
         /// only called when RequirePinAuth is set to true.
         /// </summary>
+        /// <param name="transmitterName">name of the transmitter to authentificate</param>
         /// <param name="pin">the pin that is available</param>
-        void OnPinAvailable(string pin)
+        void OnPinAvailable(string transmitterName, string pin)
         {
             Log($"new pin available: {pin}");
 
-            //close old pin ui (if still visible)
-            pinUI?.Close();
-
-            //init and show pin ui
-            if (App.Config.CastDisplayId < 0)
-                //primary screen
-                pinUI = new PinUI(pin);
-            else
-                //selected screen
-                pinUI = new PinUI(pin, App.Config.CastDisplayId);
-
-            pinUI.Show();
+            //init cast ui and show pin
+            if (castUI == null) InitCastUI();
+            castUI.SetPin(S.CastPinMessage.ReplaceMap(new Dictionary<string, string>
+            {
+                {"{DisplayName}", miracastReceiver.DisplayName },
+                {"{Transmitter}", transmitterName },
+                {"{Pin}", pin }
+            }));
+            castUI.Show();
 
             //hide pin after 30 seconds
             //im not sure if this is really needed, as a transmitter should ALWAYS disconnect the session when declining the pin.
@@ -198,12 +196,16 @@ namespace ImmersiveMiracast.Core
             Task.Run(async () =>
             {
                 await Task.Delay(App.Config.PinUiTimeout);
-                pinUI?.Invoke(new MethodInvoker(() =>
+                castUI?.Invoke(new MethodInvoker(() =>
                 {
-                    //close pin ui
-                    Log("timeout reached, closing pin ui");
-                    pinUI?.Close();
-                    pinUI = null;
+                    //close ui if no playback started
+                    if (castPlaybackStarted) return;
+
+                    Log("timeout reached, closing cast ui");
+                    castUI?.Close();
+                    castUI = null;
+
+                    miracastReceiver.StartNewSession();
                 }));
             });
         }
@@ -216,11 +218,8 @@ namespace ImmersiveMiracast.Core
         /// <param name="castPlayer">player that plays the cast stream</param>
         void OnCastStart(string transmitterName, UWPMediaPlayer castPlayer)
         {
-            //hide pin ui
-            pinUI?.Close();
-            pinUI = null;
-
             //show info
+            castPlaybackStarted = true;
             Log("cast playback started");
             ShowToast(S.AppName, S.CastWelcome.ReplaceMap(new Dictionary<string, string>
             {
@@ -229,12 +228,8 @@ namespace ImmersiveMiracast.Core
             }, true));
 
             //init and show cast ui
-            if (App.Config.CastDisplayId < 0)
-                //primary screen
-                castUI = new ImmersiveCastUI(S.AppName, castPlayer);
-            else
-                //selected screen
-                castUI = new ImmersiveCastUI(S.AppName, castPlayer, App.Config.CastDisplayId);
+            if (castUI == null) InitCastUI();
+            castUI.SetCastSource(castPlayer);
             castUI.KeyPreview = true;
             castUI.PreviewKeyDown += (s, e) =>
             {
@@ -252,12 +247,9 @@ namespace ImmersiveMiracast.Core
         /// </summary>
         void OnCastEnd()
         {
-            //hide pin ui
-            pinUI?.Close();
-            pinUI = null;
-
             //show info
             Log("cast playback ended");
+            castPlaybackStarted = false;
 
             //close cast ui
             castUI?.Close();
@@ -266,6 +258,21 @@ namespace ImmersiveMiracast.Core
         #endregion
 
         #region UI Util
+
+        /// <summary>
+        /// initialize the immersive cast ui
+        /// </summary>
+        void InitCastUI()
+        {
+            //init and show cast ui
+            if (App.Config.CastDisplayId < 0)
+                //primary screen
+                castUI = new ImmersiveCastUI(S.AppName);
+            else
+                //selected screen
+                castUI = new ImmersiveCastUI(S.AppName, App.Config.CastDisplayId);
+        }
+
         /// <summary>
         /// show a error dialog (message box)
         /// </summary>

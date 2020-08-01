@@ -125,6 +125,14 @@ namespace ImmersiveMiracast.Core
         public string CastUnknownError { get; set; } = "A unknown error occured while starting the Miracast sink.\nApplication will now terminate.";
 
         /// <summary>
+        /// message shown when a pin is needed to authentificate the connection
+        /// {DisplayName}: display name of the receiver
+        /// {Transmitter}: display name of the transmitter currently casting
+        /// {Pin}:         pin needed to authentificate.
+        /// </summary>
+        public string CastPinMessage { get; set; } = "{Transmitter}'s Pin:\n{Pin}";
+
+        /// <summary>
         /// a new connection was made with the receiver
         /// {DisplayName}: display name of the receiver
         /// {Transmitter}: display name of the transmitter currently casting

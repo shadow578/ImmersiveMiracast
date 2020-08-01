@@ -21,21 +21,17 @@ namespace ImmersiveMiracast.UI
         protected ImmersiveCastUI()
         {
             InitializeComponent();
-            InitUI();
+            lPin.Visible = false;
         }
 
         /// <summary>
         /// initialize the cast ui on the primary screen
         /// </summary>
         /// <param name="title">the title for the window</param>
-        /// <param name="player">player to render to the window</param>
-        public ImmersiveCastUI(string title, UWPMediaPlayer player) : this()
+        public ImmersiveCastUI(string title) : this()
         {
             //set title
             Text = title;
-
-            //set player to render to media element
-            mediaPlayerElement.SetMediaPlayer(player);
 
             //move window to primary scrren
             Location = Screen.PrimaryScreen.Bounds.Location;
@@ -48,15 +44,11 @@ namespace ImmersiveMiracast.UI
         /// initialize the cast ui on the given screen
         /// </summary>
         /// <param name="title">the title for the window</param>
-        /// <param name="player">player to render to the window</param>
         /// <param name="screen">screen to display the ui on. this is a index to Screen.AllScreens</param>
-        public ImmersiveCastUI(string title, UWPMediaPlayer player, int screen) : this()
+        public ImmersiveCastUI(string title, int screen) : this()
         {
             //set title
             Text = title;
-
-            //set player to render to media element
-            mediaPlayerElement.SetMediaPlayer(player);
 
             //move window to desired screen, check bounds first
             if (screen < 0 || screen >= Screen.AllScreens.Length)
@@ -75,16 +67,36 @@ namespace ImmersiveMiracast.UI
         }
 
         /// <summary>
-        /// initialize the ui, manually because forms designer for dotnet core is broken :|
+        /// set the pin displayed on the ui.
+        /// Only valid if SetCastSource() was not yet called
         /// </summary>
-        void InitUI()
+        /// <param name="pinMsg">the pin (message) to display (can be multi- line)</param>
+        public void SetPin(string pinMsg)
         {
-            SuspendLayout();
+            if (mediaPlayerElement != null) return;
 
-            //set window background to black
-            BackColor = Color.Black;
+            //set pin display
+            lPin.Text = pinMsg;
+            lPin.Visible = true;
+        }
 
-            //init media player element
+        /// <summary>
+        /// set the cast source that should render on the ui
+        /// </summary>
+        /// <param name="castPlayer">the player to render on the ui</param>
+        public void SetCastSource(UWPMediaPlayer castPlayer)
+        {
+            //hide pin display
+            lPin.Visible = false;
+
+            //clear old mediaplayer element
+            if (mediaPlayerElement != null)
+            {
+                Controls.Remove(mediaPlayerElement);
+                mediaPlayerElement.Dispose();
+            }
+
+            //init new media player element
             mediaPlayerElement = new MediaPlayerElement()
             {
                 Location = new Point(0, 0),
@@ -93,9 +105,12 @@ namespace ImmersiveMiracast.UI
                 BackColor = Color.Black,
                 Stretch = Microsoft.Toolkit.Win32.UI.Controls.Interop.WinRT.Stretch.UniformToFill
             };
-            Controls.Add(mediaPlayerElement);
 
-            ResumeLayout();
+            //set player to render to media element
+            mediaPlayerElement.SetMediaPlayer(castPlayer);
+
+            //add to window
+            Controls.Add(mediaPlayerElement);
         }
 
         /// <summary>
@@ -109,6 +124,21 @@ namespace ImmersiveMiracast.UI
 
             //cursor go hide
             Cursor.Hide();
+
+            //unhide cursor when window exits
+            FormClosing += (se, no) =>
+            {
+                Cursor.Show();
+            };
+        }
+
+        /// <summary>
+        /// internal Dispose(bool) function
+        /// </summary>
+        void DisposeInt()
+        {
+            mediaPlayerElement?.Dispose();
+            mediaPlayerElement = null;
         }
     }
 }

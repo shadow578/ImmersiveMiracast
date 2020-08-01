@@ -75,6 +75,7 @@ namespace ImmersiveMiracast.UI.Config
             //strings
             tAppName.Text = cfg.Strings.AppName;
             tCastReady.Text = cfg.Strings.CastReady;
+            tCastPinMessage.Text = cfg.Strings.CastPinMessage;
             tCastWelcome.Text = cfg.Strings.CastWelcome;
             tTrayConfigure.Text = cfg.Strings.TrayConfigure;
             tTrayRestartSession.Text = cfg.Strings.TrayRestartSession;
@@ -116,6 +117,7 @@ namespace ImmersiveMiracast.UI.Config
             //strings
             cfg.Strings.AppName = tAppName.Text;
             cfg.Strings.CastReady = tCastReady.Text;
+            cfg.Strings.CastPinMessage = tCastPinMessage.Text;
             cfg.Strings.CastWelcome = tCastWelcome.Text;
             cfg.Strings.TrayConfigure = tTrayConfigure.Text;
             cfg.Strings.TrayRestartSession = tTrayRestartSession.Text;

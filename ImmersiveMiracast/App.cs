@@ -97,6 +97,9 @@ namespace ImmersiveMiracast
                 AppInstance = new CastApp();
                 Application.Run(AppInstance);
             } while (ShouldRestartApp);
+
+            //kill cast server when exiting
+            TryKillCastServer();
         }
 
         /// <summary>
@@ -133,7 +136,7 @@ namespace ImmersiveMiracast
 
                 //wait for processes to settle
                 if (killedCastServer)
-                    Thread.Sleep(1000);
+                    Thread.Sleep(5000);
             }
             catch (Exception e)
             {

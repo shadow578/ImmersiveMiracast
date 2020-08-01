@@ -55,7 +55,7 @@ namespace ImmersiveMiracast.Core
         /// called when a new pin is available. Show this pin somewhere in your ui, and only hide it when either CastStart or CastEnd have been called.
         /// only called when RequirePinAuth is set to true.
         /// </summary>
-        public event Action<string /*pin*/> PinAvailable;
+        public event Action<string /*transmitterName*/, string /*pin*/> PinAvailable;
 
         /// <summary>
         /// called when a new cast session starts, and the media source was created and is ready. 
@@ -224,7 +224,7 @@ namespace ImmersiveMiracast.Core
 
             //send pin event
             if (!string.IsNullOrWhiteSpace(args.Pin))
-                PinAvailable?.Invoke(args.Pin);
+                PinAvailable?.Invoke(CurrentConnection.Transmitter.Name, args.Pin);
 
             //log details
             Log($"new connection created with {CurrentConnection.Transmitter.Name} ({CurrentConnection.Transmitter.MacAddress}). Auth pin is {(string.IsNullOrWhiteSpace(args.Pin) ? "No Pin" : args.Pin)}");

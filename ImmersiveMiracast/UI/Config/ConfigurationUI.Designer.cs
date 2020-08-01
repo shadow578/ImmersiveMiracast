@@ -49,6 +49,7 @@
             this.tCastWelcome = new System.Windows.Forms.TextBox();
             this.tCastReady = new System.Windows.Forms.TextBox();
             this.tAppName = new System.Windows.Forms.TextBox();
+            this.cCastRequirePin = new System.Windows.Forms.CheckBox();
             this.btnIdentifyScreenIds = new System.Windows.Forms.Button();
             this.cbCastScreenId = new System.Windows.Forms.ComboBox();
             this.cCastPrimaryScreen = new System.Windows.Forms.CheckBox();
@@ -58,7 +59,8 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.sharedTooltip = new System.Windows.Forms.ToolTip(this.components);
             this.groupAdvanced = new System.Windows.Forms.GroupBox();
-            this.cCastRequirePin = new System.Windows.Forms.CheckBox();
+            this.tCastPinMessage = new System.Windows.Forms.TextBox();
+            this.label10 = new System.Windows.Forms.Label();
             groupStrings = new System.Windows.Forms.GroupBox();
             label7 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
@@ -79,6 +81,8 @@
             // 
             // groupStrings
             // 
+            groupStrings.Controls.Add(this.label10);
+            groupStrings.Controls.Add(this.tCastPinMessage);
             groupStrings.Controls.Add(this.tTrayExitApp);
             groupStrings.Controls.Add(label7);
             groupStrings.Controls.Add(this.tTrayRestartApp);
@@ -95,14 +99,14 @@
             groupStrings.Controls.Add(label1);
             groupStrings.Location = new System.Drawing.Point(435, 15);
             groupStrings.Name = "groupStrings";
-            groupStrings.Size = new System.Drawing.Size(516, 230);
+            groupStrings.Size = new System.Drawing.Size(516, 258);
             groupStrings.TabIndex = 0;
             groupStrings.TabStop = false;
             groupStrings.Text = "Strings";
             // 
             // tTrayExitApp
             // 
-            this.tTrayExitApp.Location = new System.Drawing.Point(129, 196);
+            this.tTrayExitApp.Location = new System.Drawing.Point(129, 225);
             this.tTrayExitApp.MaxLength = 255;
             this.tTrayExitApp.Name = "tTrayExitApp";
             this.tTrayExitApp.Size = new System.Drawing.Size(373, 23);
@@ -112,7 +116,7 @@
             // label7
             // 
             label7.AutoSize = true;
-            label7.Location = new System.Drawing.Point(6, 199);
+            label7.Location = new System.Drawing.Point(6, 228);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(83, 15);
             label7.TabIndex = 0;
@@ -120,7 +124,7 @@
             // 
             // tTrayRestartApp
             // 
-            this.tTrayRestartApp.Location = new System.Drawing.Point(129, 167);
+            this.tTrayRestartApp.Location = new System.Drawing.Point(129, 196);
             this.tTrayRestartApp.MaxLength = 255;
             this.tTrayRestartApp.Name = "tTrayRestartApp";
             this.tTrayRestartApp.Size = new System.Drawing.Size(373, 23);
@@ -130,7 +134,7 @@
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new System.Drawing.Point(6, 170);
+            label6.Location = new System.Drawing.Point(6, 199);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(100, 15);
             label6.TabIndex = 0;
@@ -138,7 +142,7 @@
             // 
             // tTrayRestartSession
             // 
-            this.tTrayRestartSession.Location = new System.Drawing.Point(129, 138);
+            this.tTrayRestartSession.Location = new System.Drawing.Point(129, 167);
             this.tTrayRestartSession.MaxLength = 255;
             this.tTrayRestartSession.Name = "tTrayRestartSession";
             this.tTrayRestartSession.Size = new System.Drawing.Size(373, 23);
@@ -148,7 +152,7 @@
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(6, 141);
+            label5.Location = new System.Drawing.Point(6, 170);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(117, 15);
             label5.TabIndex = 0;
@@ -156,7 +160,7 @@
             // 
             // tTrayConfigure
             // 
-            this.tTrayConfigure.Location = new System.Drawing.Point(129, 109);
+            this.tTrayConfigure.Location = new System.Drawing.Point(129, 138);
             this.tTrayConfigure.MaxLength = 255;
             this.tTrayConfigure.Name = "tTrayConfigure";
             this.tTrayConfigure.Size = new System.Drawing.Size(373, 23);
@@ -166,7 +170,7 @@
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(6, 112);
+            label4.Location = new System.Drawing.Point(6, 141);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(92, 15);
             label4.TabIndex = 0;
@@ -174,7 +178,7 @@
             // 
             // tCastWelcome
             // 
-            this.tCastWelcome.Location = new System.Drawing.Point(129, 80);
+            this.tCastWelcome.Location = new System.Drawing.Point(129, 109);
             this.tCastWelcome.MaxLength = 255;
             this.tCastWelcome.Name = "tCastWelcome";
             this.tCastWelcome.Size = new System.Drawing.Size(373, 23);
@@ -185,7 +189,7 @@
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(6, 83);
+            label3.Location = new System.Drawing.Point(6, 112);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(83, 15);
             label3.TabIndex = 0;
@@ -239,10 +243,21 @@
             groupApp.Controls.Add(this.cShouldAppAutostart);
             groupApp.Location = new System.Drawing.Point(15, 15);
             groupApp.Name = "groupApp";
-            groupApp.Size = new System.Drawing.Size(414, 171);
+            groupApp.Size = new System.Drawing.Size(414, 199);
             groupApp.TabIndex = 0;
             groupApp.TabStop = false;
             groupApp.Text = "App Settings";
+            // 
+            // cCastRequirePin
+            // 
+            this.cCastRequirePin.AutoSize = true;
+            this.cCastRequirePin.Location = new System.Drawing.Point(6, 140);
+            this.cCastRequirePin.Name = "cCastRequirePin";
+            this.cCastRequirePin.Size = new System.Drawing.Size(148, 19);
+            this.cCastRequirePin.TabIndex = 30;
+            this.cCastRequirePin.Text = "Require Pin to Connect";
+            this.cCastRequirePin.UseVisualStyleBackColor = true;
+            this.cCastRequirePin.CheckedChanged += new System.EventHandler(this.OnCastToPrimaryScreenChange);
             // 
             // btnIdentifyScreenIds
             // 
@@ -339,7 +354,7 @@
             // btnApply
             // 
             this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnApply.Location = new System.Drawing.Point(796, 254);
+            this.btnApply.Location = new System.Drawing.Point(796, 281);
             this.btnApply.Name = "btnApply";
             this.btnApply.Size = new System.Drawing.Size(148, 23);
             this.btnApply.TabIndex = 130;
@@ -351,7 +366,7 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnCancel.Location = new System.Drawing.Point(12, 254);
+            this.btnCancel.Location = new System.Drawing.Point(12, 281);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(148, 23);
             this.btnCancel.TabIndex = 120;
@@ -364,23 +379,32 @@
             // 
             this.groupAdvanced.Controls.Add(btnOpenConfigInEditor);
             this.groupAdvanced.Controls.Add(btnResetConfig);
-            this.groupAdvanced.Location = new System.Drawing.Point(15, 192);
+            this.groupAdvanced.Location = new System.Drawing.Point(15, 220);
             this.groupAdvanced.Name = "groupAdvanced";
             this.groupAdvanced.Size = new System.Drawing.Size(414, 53);
             this.groupAdvanced.TabIndex = 4;
             this.groupAdvanced.TabStop = false;
             this.groupAdvanced.Text = "Advanced";
             // 
-            // cCastRequirePin
+            // tCastPinMessage
             // 
-            this.cCastRequirePin.AutoSize = true;
-            this.cCastRequirePin.Location = new System.Drawing.Point(6, 140);
-            this.cCastRequirePin.Name = "cCastRequirePin";
-            this.cCastRequirePin.Size = new System.Drawing.Size(148, 19);
-            this.cCastRequirePin.TabIndex = 30;
-            this.cCastRequirePin.Text = "Require Pin to Connect";
-            this.cCastRequirePin.UseVisualStyleBackColor = true;
-            this.cCastRequirePin.CheckedChanged += new System.EventHandler(this.OnCastToPrimaryScreenChange);
+            this.tCastPinMessage.Location = new System.Drawing.Point(129, 80);
+            this.tCastPinMessage.MaxLength = 255;
+            this.tCastPinMessage.Name = "tCastPinMessage";
+            this.tCastPinMessage.Size = new System.Drawing.Size(373, 23);
+            this.tCastPinMessage.TabIndex = 110;
+            this.sharedTooltip.SetToolTip(this.tCastPinMessage, "message shown when a pin is required to authentificate\r\n{DisplayName}: display na" +
+        "me of the receiver\r\n{Transmitter}: name of the transmitter to authentificate\r\n{P" +
+        "in}: the pin to authentificate");
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(6, 83);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(73, 15);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Pin Message";
             // 
             // ConfigurationUI
             // 
@@ -388,7 +412,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
-            this.ClientSize = new System.Drawing.Size(959, 292);
+            this.ClientSize = new System.Drawing.Size(959, 319);
             this.Controls.Add(this.groupAdvanced);
             this.Controls.Add(groupApp);
             this.Controls.Add(groupStrings);
@@ -426,5 +450,7 @@
         private System.Windows.Forms.GroupBox groupAdvanced;
         private System.Windows.Forms.Button btnIdentifyScreenIds;
         private System.Windows.Forms.CheckBox cCastRequirePin;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.TextBox tCastPinMessage;
     }
 }
