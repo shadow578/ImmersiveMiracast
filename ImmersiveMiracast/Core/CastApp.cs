@@ -46,11 +46,6 @@ namespace ImmersiveMiracast.Core
         /// </summary>
         ConfigurationUI configUI;
 
-        /// <summary>
-        /// did playback of the cast stream start?
-        /// </summary>
-        bool castPlaybackStarted = false;
-
         public CastApp()
         {
             //register application exit
@@ -199,7 +194,6 @@ namespace ImmersiveMiracast.Core
         void OnCastStart(string transmitterName, UWPMediaPlayer castPlayer)
         {
             //show info
-            castPlaybackStarted = true;
             Log("cast playback started");
             ShowToast(S.AppName, S.CastWelcome.ReplaceMap(new Dictionary<string, string>
             {
@@ -229,7 +223,6 @@ namespace ImmersiveMiracast.Core
         {
             //show info
             Log("cast playback ended");
-            castPlaybackStarted = false;
 
             //recycle cast ui
             //have to recycle the ui as the xaml host (and thus the media player element) locks up otherwise 

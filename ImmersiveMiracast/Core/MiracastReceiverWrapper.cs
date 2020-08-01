@@ -49,11 +49,6 @@ namespace ImmersiveMiracast.Core
         UWPMediaPlayer currentPlayer;
 
         /// <summary>
-        /// task that automatically times out the current conection if no media source is created
-        /// </summary>
-        Task currentConnectionTimeoutTask;
-
-        /// <summary>
         /// token to cancel the current connection's timeout
         /// </summary>
         CancellationTokenSource currentConnectionTimeoutCancellation;
@@ -257,7 +252,7 @@ namespace ImmersiveMiracast.Core
             currentConnectionTimeoutCancellation = new CancellationTokenSource();
             if (DeadConnectionTimeout > 0)
             {
-                currentConnectionTimeoutTask = Task.Run(async () =>
+                Task.Run(async () =>
                 {
                     try
                     {
@@ -279,7 +274,7 @@ namespace ImmersiveMiracast.Core
                         //connection looks fine to me 
                         Log("connection looks healthy, timeout task will now shut down.");
                     }
-                    catch (TaskCanceledException _)
+                    catch (TaskCanceledException)
                     {
                         //timeout was cancelled
                         Log("connection timeout was cancelled");
