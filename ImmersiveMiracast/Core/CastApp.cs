@@ -159,12 +159,15 @@ namespace ImmersiveMiracast.Core
         /// </summary>
         void OnAppExit(object sender, EventArgs e)
         {
-            //dispose of tray ui
-            trayUI.Dispose();
+            //disable interactions on the tray ui
+            trayUI.Interactable = false;
 
             //end current session
             miracastReceiver.AutoStartNewSession = false;
             miracastReceiver.EndCastSession();
+
+            //dispose of tray ui
+            trayUI.Dispose();
         }
 
         /// <summary>
@@ -174,8 +177,12 @@ namespace ImmersiveMiracast.Core
         /// <param name="pin">the pin that is available</param>
         void OnPinAvailable(string pin)
         {
-            //init and show pin ui
             Log($"new pin available: {pin}");
+
+            //close old pin ui (if still visible)
+            pinUI?.Close();
+
+            //init and show pin ui
             if (App.Config.CastDisplayId < 0)
                 //primary screen
                 pinUI = new PinUI(pin);
@@ -193,6 +200,8 @@ namespace ImmersiveMiracast.Core
                 await Task.Delay(App.Config.PinUiTimeout);
                 pinUI?.Invoke(new MethodInvoker(() =>
                 {
+                    //close pin ui
+                    Log("timeout reached, closing pin ui");
                     pinUI?.Close();
                     pinUI = null;
                 }));

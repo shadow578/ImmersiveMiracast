@@ -21,6 +21,22 @@ namespace ImmersiveMiracast.UI
         ContextMenuStrip menu = new ContextMenuStrip();
 
         /// <summary>
+        /// Can the tray ui be interacted with?
+        /// </summary>
+        public bool Interactable
+        {
+            get
+            {
+                return trayIcon?.ContextMenuStrip != null && trayIcon.ContextMenuStrip.Enabled;
+            }
+            set
+            {
+                if (trayIcon?.ContextMenuStrip != null)
+                    trayIcon.ContextMenuStrip.Enabled = value;
+            }
+        }
+
+        /// <summary>
         /// initialize the tray icon
         /// </summary>
         /// <param name="title">title to use for the icon</param>
