@@ -27,6 +27,11 @@ namespace ImmersiveMiracast.Core
         public bool CastRequirePin { get; set; } = false;
 
         /// <summary>
+        /// kill stray CastSvr instances on launch?
+        /// </summary>
+        public bool KillStrayCastServer { get; set; } = true;
+
+        /// <summary>
         /// timeout until the pin ui is closed
         /// </summary>
         public int PinUiTimeout { get; set; } = 30000;

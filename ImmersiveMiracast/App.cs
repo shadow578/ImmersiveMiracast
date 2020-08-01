@@ -1,8 +1,7 @@
 ﻿using ImmersiveMiracast.Core;
-using ImmersiveMiracast.UI;
-using ImmersiveMiracast.UI.Config;
 using ImmersiveMiracast.Util;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
@@ -86,6 +85,10 @@ namespace ImmersiveMiracast
                 //(re)load config
                 LoadConfig();
 
+                //kill cast server
+                if (Config.KillStrayCastServer)
+                    TryKillCastServer();
+
                 //enable / disable autostart
                 Win32Util.RegisterAutostart(Config.Strings.AppName, LaunchCommand, Config.ShouldAppAutostart);
 
@@ -105,6 +108,25 @@ namespace ImmersiveMiracast
 
             //rewrite config file (in case config layout changed, to add the missing keys)
             Config.ToFile(ConfigFile);
+        }
+
+        /// <summary>
+        /// Try to kill stray castsvr instances
+        /// </summary>
+        static void TryKillCastServer()
+        {
+            try
+            {
+                foreach (Process p in Process.GetProcesses())
+                {
+                    if (p.ProcessName.Equals("CastSrv", StringComparison.OrdinalIgnoreCase))
+                        p.Kill(true);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"TryKillCastServer(): {e.ToString()}");
+            }
         }
     }
 }
