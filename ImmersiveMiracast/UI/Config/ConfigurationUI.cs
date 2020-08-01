@@ -106,7 +106,7 @@ namespace ImmersiveMiracast.UI.Config
             cfg.ShouldAppAutostart = cShouldAppAutostart.Checked;
             if (cCastPrimaryScreen.Checked)
             {
-                cfg.CastDisplayId = 0;
+                cfg.CastDisplayId = -1;
             }
             else
             {
