@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ImmersiveMiracast
@@ -117,14 +118,22 @@ namespace ImmersiveMiracast
         {
             try
             {
+                //kill cast server
+                bool killedCastServer = false;
                 foreach (Process p in Process.GetProcesses())
                 {
                     if (p.ProcessName.Equals("CastSrv", StringComparison.OrdinalIgnoreCase))
                     {
                         Debug.WriteLine($"Killing CastSrv with PID {p.Id}");
                         p.Kill(true);
+                        p.WaitForExit(10000);
+                        killedCastServer = true;
                     }
                 }
+
+                //wait for processes to settle
+                if (killedCastServer)
+                    Thread.Sleep(1000);
             }
             catch (Exception e)
             {
