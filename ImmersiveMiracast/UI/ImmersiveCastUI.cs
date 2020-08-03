@@ -16,6 +16,37 @@ namespace ImmersiveMiracast.UI
         MediaPlayerElement mediaPlayerElement;
 
         /// <summary>
+        /// is the window in immersive mode?
+        /// </summary>
+        public bool Immersive
+        {
+            get
+            {
+                return WindowState == FormWindowState.Maximized;
+            }
+            set
+            {
+                FormBorderStyle = FormBorderStyle.None;
+                if (value)
+                {
+                    //window go brr
+                    WindowState = FormWindowState.Maximized;
+
+                    //cursor go hide
+                    Cursor.Hide();
+                }
+                else
+                {
+                    //window go brr
+                    WindowState = FormWindowState.Normal;
+
+                    //cursor go hide
+                    Cursor.Show();
+                }
+            }
+        }
+
+        /// <summary>
         /// initialize the ui with default settings.
         /// </summary>
         protected ImmersiveCastUI()
@@ -32,38 +63,23 @@ namespace ImmersiveMiracast.UI
         {
             //set title
             Text = title;
-
-            //move window to primary scrren
-            Location = Screen.PrimaryScreen.Bounds.Location;
-
-            //be immersive
-            GoImmersive();
         }
 
         /// <summary>
-        /// initialize the cast ui on the given screen
+        /// move the window to the sceen
         /// </summary>
-        /// <param name="title">the title for the window</param>
-        /// <param name="screen">screen to display the ui on. this is a index to Screen.AllScreens</param>
-        public ImmersiveCastUI(string title, int screen) : this()
+        /// <param name="screenId">screen to display the ui on. this is a index to Screen.AllScreens. use -1 to use the primary screen</param>
+        public void MoveToScreen(int screenId = -1)
         {
-            //set title
-            Text = title;
-
-            //move window to desired screen, check bounds first
-            if (screen < 0 || screen >= Screen.AllScreens.Length)
+            //get which screen to move to, default is primary
+            Screen targetScreen = Screen.PrimaryScreen;
+            if(screenId >= 0 && screenId <= Screen.AllScreens.Length)
             {
-                //default to primary screen
-                Location = Screen.PrimaryScreen.Bounds.Location;
-            }
-            else
-            {
-                //move to desired screen
-                Location = Screen.AllScreens[screen].Bounds.Location;
+                targetScreen = Screen.AllScreens[screenId];
             }
 
-            //be immersive
-            GoImmersive();
+            //move to screen
+            Location = targetScreen.Bounds.Location;
         }
 
         /// <summary>
@@ -114,7 +130,17 @@ namespace ImmersiveMiracast.UI
         }
 
         /// <summary>
+        /// show the UI and make it fullscreen
+        /// </summary>
+        public void ShowImmersive()
+        {
+            Show();
+            Immersive = true;
+        }
+
+        /// <summary>
         /// dispose xaml controls and hide the ui.
+        /// also disables immersive mode
         /// This allows reuse of the control
         /// </summary>
         public new void Hide()
@@ -127,27 +153,11 @@ namespace ImmersiveMiracast.UI
                 mediaPlayerElement = null;
             }
 
+            //disable immersive mode
+            Immersive = false;
+
             //hide ui
             base.Hide();
-        }
-
-        /// <summary>
-        /// enter fullscreen to finish immersive mode
-        /// </summary>
-        void GoImmersive()
-        {
-            //window go brr
-            FormBorderStyle = FormBorderStyle.None;
-            WindowState = FormWindowState.Maximized;
-
-            //cursor go hide
-            Cursor.Hide();
-
-            //unhide cursor when window exits
-            FormClosing += (se, no) =>
-            {
-                Cursor.Show();
-            };
         }
     }
 }

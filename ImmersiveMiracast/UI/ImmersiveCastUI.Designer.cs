@@ -52,6 +52,7 @@
             this.ControlBox = false;
             this.Controls.Add(this.lPin);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Name = "ImmersiveCastUI";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

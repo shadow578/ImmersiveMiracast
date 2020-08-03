@@ -175,14 +175,15 @@ namespace ImmersiveMiracast.Core
             Log($"new pin available: {pin}");
 
             //init cast ui and show pin
-            if (castUI == null) InitCastUI();
+            if (castUI == null) castUI = new ImmersiveCastUI(S.AppName);
+            castUI.MoveToScreen(App.Config.CastDisplayId);
             castUI.SetPin(S.CastPinMessage.ReplaceMap(new Dictionary<string, string>
             {
                 {"{DisplayName}", miracastReceiver.DisplayName },
                 {"{Transmitter}", transmitterName },
                 {"{Pin}", pin }
             }));
-            castUI.Show();
+            castUI.ShowImmersive();
         }
 
         /// <summary>
@@ -202,7 +203,8 @@ namespace ImmersiveMiracast.Core
             }, true));
 
             //init and show cast ui
-            if (castUI == null) InitCastUI();
+            if (castUI == null) castUI = new ImmersiveCastUI(S.AppName);
+            castUI.MoveToScreen(App.Config.CastDisplayId);
             castUI.SetCastSource(castPlayer);
             castUI.KeyPreview = true;
             castUI.PreviewKeyDown += (s, e) =>
@@ -213,7 +215,7 @@ namespace ImmersiveMiracast.Core
                     miracastReceiver.EndCastSession();
                 }
             };
-            castUI.Show();
+            castUI.ShowImmersive();
         }
 
         /// <summary>
@@ -231,21 +233,6 @@ namespace ImmersiveMiracast.Core
         #endregion
 
         #region UI Util
-
-        /// <summary>
-        /// initialize the immersive cast ui
-        /// </summary>
-        void InitCastUI()
-        {
-            //init and show cast ui
-            if (App.Config.CastDisplayId < 0)
-                //primary screen
-                castUI = new ImmersiveCastUI(S.AppName);
-            else
-                //selected screen
-                castUI = new ImmersiveCastUI(S.AppName, App.Config.CastDisplayId);
-        }
-
         /// <summary>
         /// show a error dialog (message box)
         /// </summary>
