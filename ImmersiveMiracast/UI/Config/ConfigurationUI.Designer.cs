@@ -42,6 +42,8 @@
             System.Windows.Forms.Label label8;
             System.Windows.Forms.Button btnResetConfig;
             System.Windows.Forms.Button btnOpenConfigInEditor;
+            this.label10 = new System.Windows.Forms.Label();
+            this.tCastPinMessage = new System.Windows.Forms.TextBox();
             this.tTrayExitApp = new System.Windows.Forms.TextBox();
             this.tTrayRestartApp = new System.Windows.Forms.TextBox();
             this.tTrayRestartSession = new System.Windows.Forms.TextBox();
@@ -55,12 +57,11 @@
             this.cCastPrimaryScreen = new System.Windows.Forms.CheckBox();
             this.tCastDisplayName = new System.Windows.Forms.TextBox();
             this.cShouldAppAutostart = new System.Windows.Forms.CheckBox();
+            this.lAppVersion = new System.Windows.Forms.Label();
             this.btnApply = new System.Windows.Forms.Button();
             this.btnCancel = new System.Windows.Forms.Button();
             this.sharedTooltip = new System.Windows.Forms.ToolTip(this.components);
             this.groupAdvanced = new System.Windows.Forms.GroupBox();
-            this.tCastPinMessage = new System.Windows.Forms.TextBox();
-            this.label10 = new System.Windows.Forms.Label();
             groupStrings = new System.Windows.Forms.GroupBox();
             label7 = new System.Windows.Forms.Label();
             label6 = new System.Windows.Forms.Label();
@@ -103,6 +104,26 @@
             groupStrings.TabIndex = 0;
             groupStrings.TabStop = false;
             groupStrings.Text = "Strings";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(6, 83);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(73, 15);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Pin Message";
+            // 
+            // tCastPinMessage
+            // 
+            this.tCastPinMessage.Location = new System.Drawing.Point(129, 80);
+            this.tCastPinMessage.MaxLength = 255;
+            this.tCastPinMessage.Name = "tCastPinMessage";
+            this.tCastPinMessage.Size = new System.Drawing.Size(373, 23);
+            this.tCastPinMessage.TabIndex = 110;
+            this.sharedTooltip.SetToolTip(this.tCastPinMessage, "message shown when a pin is required to authentificate\r\n{DisplayName}: display na" +
+        "me of the receiver\r\n{Transmitter}: name of the transmitter to authentificate\r\n{P" +
+        "in}: the pin to authentificate");
             // 
             // tTrayExitApp
             // 
@@ -351,6 +372,15 @@
             btnOpenConfigInEditor.UseVisualStyleBackColor = true;
             btnOpenConfigInEditor.Click += new System.EventHandler(this.OnOpenConfigInEditor);
             // 
+            // lAppVersion
+            // 
+            this.lAppVersion.Location = new System.Drawing.Point(796, 6);
+            this.lAppVersion.Name = "lAppVersion";
+            this.lAppVersion.Size = new System.Drawing.Size(155, 15);
+            this.lAppVersion.TabIndex = 131;
+            this.lAppVersion.Text = "0.0.0";
+            this.lAppVersion.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
             // btnApply
             // 
             this.btnApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -386,26 +416,6 @@
             this.groupAdvanced.TabStop = false;
             this.groupAdvanced.Text = "Advanced";
             // 
-            // tCastPinMessage
-            // 
-            this.tCastPinMessage.Location = new System.Drawing.Point(129, 80);
-            this.tCastPinMessage.MaxLength = 255;
-            this.tCastPinMessage.Name = "tCastPinMessage";
-            this.tCastPinMessage.Size = new System.Drawing.Size(373, 23);
-            this.tCastPinMessage.TabIndex = 110;
-            this.sharedTooltip.SetToolTip(this.tCastPinMessage, "message shown when a pin is required to authentificate\r\n{DisplayName}: display na" +
-        "me of the receiver\r\n{Transmitter}: name of the transmitter to authentificate\r\n{P" +
-        "in}: the pin to authentificate");
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(6, 83);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(73, 15);
-            this.label10.TabIndex = 0;
-            this.label10.Text = "Pin Message";
-            // 
             // ConfigurationUI
             // 
             this.AcceptButton = this.btnApply;
@@ -413,6 +423,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnCancel;
             this.ClientSize = new System.Drawing.Size(959, 319);
+            this.Controls.Add(this.lAppVersion);
             this.Controls.Add(this.groupAdvanced);
             this.Controls.Add(groupApp);
             this.Controls.Add(groupStrings);
@@ -452,5 +463,6 @@
         private System.Windows.Forms.CheckBox cCastRequirePin;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.TextBox tCastPinMessage;
+        private System.Windows.Forms.Label lAppVersion;
     }
 }

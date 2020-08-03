@@ -1,6 +1,7 @@
 ﻿using ImmersiveMiracast.Core;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace ImmersiveMiracast.UI.Config
@@ -34,6 +35,7 @@ namespace ImmersiveMiracast.UI.Config
         {
             cfgPath = configPath;
             ReloadConfigFile();
+            RefreshAppVersionLabel();
         }
 
         /// <summary>
@@ -125,6 +127,22 @@ namespace ImmersiveMiracast.UI.Config
             cfg.Strings.TrayExitApp = tTrayExitApp.Text;
         }
 
+        /// <summary>
+        /// refreshes the app version label
+        /// </summary>
+        void RefreshAppVersionLabel()
+        {
+            //get app version
+            Version appVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+            //update label text
+            string versionStr = appVersion.ToString(3);
+#if DEBUG
+            versionStr += "-DEBUG";
+#endif
+            lAppVersion.Text = versionStr;
+        }
+
         #region UI Events
         /// <summary>
         /// cast to primary screen checkbox changed, toggle screen id combobox
@@ -187,6 +205,6 @@ namespace ImmersiveMiracast.UI.Config
             Application.Exit();
             Close();
         }
-        #endregion
+#endregion
     }
 }
